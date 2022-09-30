@@ -38,6 +38,17 @@ client.on("messageCreate", (message) => {
     if (command === "ping") {
       message.channel.send("Pong!");
     }
+    if (command === "hello") {
+      message.channel.send("Hello David!");
+    }
+    if (command === "sharks") {
+      message.channel.send(
+        "Sharks are beautiful creatures that are misunderstood"
+      );
+    }
+    if (command === "myth") {
+      message.channel.send("Sharks are dangerous");
+    }
   }
 });
 
