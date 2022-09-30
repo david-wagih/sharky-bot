@@ -42,5 +42,5 @@ client.on("messageCreate", (message) => {
 });
 
 client.login(
-  "MTAyNTUxNTI5NzkwNzY4MzM5OA.GqH9E3.9ghlf-mKJh6HTMKLhxiWr8MHZ_pXmGUn-Gdkyc"
+  "MTAyNTUxNTI5NzkwNzY4MzM5OA.GqTGN_.gDslDscuxvkhYD5EGoYoGxWz5CmpYvDysuXyWU"
 );
