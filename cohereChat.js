@@ -1,5 +1,5 @@
 const cohereChat = async (text) => {
-    console.log(text)
+    
     const response = await cohere.generate({
         model: 'xlarge',
         prompt: text,

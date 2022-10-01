@@ -1,7 +1,36 @@
-const cohereChat = import('./cohereChat.js');
-const twilio = import('./twilio.js');
 const env = require(`dotenv`).config();
+const cohereChat = import('./cohereChat.js');
 const cohere = require('cohere-ai')
+
+const TwilioClient = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+
+const getCode = async (phone) => {
+  TwilioClient
+    .verify
+    .services(process.env.VERIFY_SERVICE_SID)
+    .verifications
+    .create({
+      to: `+91-${phone}`,
+      channel: "sms"
+    })
+    .then(data => {
+      return data;
+    })
+};
+
+const verifyCode = async (req, code) => {
+  TwilioClient
+    .verify
+    .services(process.env.VERIFY_SERVICE_SID)
+    .verificationChecks
+    .create({
+      to: `+91-${req}`,
+      code: code,
+    })
+    .then(data => {
+      return data;
+    });
+};
 
 
 cohere.init(process.env.API_KEY);
@@ -48,15 +77,21 @@ client.on("messageCreate", (message) => {
     }
 
     if (command === "help") {
-      message.channel.send("Sharky is here to help!");
+      if (!args.length) {
+        return message.channel.send(`You didn't provide any arguments, ${message.author}!`);
+      }
+      message.channel.send("Sharky is here to help!", message.author);
 
       const phone = args.join(' ');
+      console.log(phone)
 
-      twilio.getCode(phone).then((response) => {
+      getCode(phone).then((response) => {
         message.channel.send(response);
-        message.channel.send('Enter OTP to verify!');
+        message.channel.send('Enter OTP sent to your phone');
 
-        twilio.verfifyCode(args.join(' '), phone).then((response) => {
+        console.log(args)
+
+        verifyCode(args.join(' '), phone).then((response) => {
           message.channel.send(response);
         });
       });
