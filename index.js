@@ -83,13 +83,13 @@ client.on("messageCreate", (message) => {
 
       getCode(phone).then((response) => {
         message.channel.send(response);
-        message.channel.send('Enter OTP sent to your phone');
+      });
+    }
 
-        console.log(args)
 
-        verifyCode(args.join(' '), phone).then((response) => {
-          message.channel.send(response);
-        });
+    if (command === "verify") {
+      verifyCode(args.join(" ")).then((response) => {
+        message.channel.send(response.status);
       });
     }
 
