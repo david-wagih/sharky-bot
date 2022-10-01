@@ -1,3 +1,6 @@
+const env = require(`dotenv`).config();
+const cohere = require('cohere-ai')
+cohere.init(process.env.API_KEY)
 const {
   Client,
   GatewayIntentBits,
@@ -6,7 +9,23 @@ const {
   Permissions,
 } = require(`discord.js`);
 
-const env = require(`dotenv`).config();
+const cohereChat = async (text) => {
+  console.log(text)
+  const response = await cohere.generate({
+    model: 'xlarge',
+    prompt: text,
+    max_tokens: 50,
+    temperature: 0.9,
+    k: 0,
+    p: 0.75,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    stop_sequences: [],
+    return_likelihoods: 'NONE'
+  })
+  console.log(response)
+  return response.body.generations[0].text;
+}
 
 const prefix = ">";
 
@@ -40,9 +59,6 @@ client.on("messageCreate", (message) => {
     if (command === "ping") {
       message.channel.send("Pong!");
     }
-    if (command === "hello") {
-      message.channel.send("Hello David!");
-    }
     if (command === "sharks") {
       message.channel.send(
         "Sharks are beautiful creatures that are misunderstood"
@@ -51,9 +67,13 @@ client.on("messageCreate", (message) => {
     if (command === "myth") {
       message.channel.send("Sharks are dangerous");
     }
+    if (command === "chat") {
+      
+      cohereChat(args.join(' ')).then((response) => {
+        message.channel.send(response);
+      })
+    }
   }
 });
 
-client.login(
-  process.env.TOKEN
-);
+client.login(process.env.TOKEN);
