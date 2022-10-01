@@ -6,6 +6,8 @@ const {
   Permissions,
 } = require(`discord.js`);
 
+const env = require(`dotenv`).config();
+
 const prefix = ">";
 
 const client = new Client({
@@ -53,5 +55,5 @@ client.on("messageCreate", (message) => {
 });
 
 client.login(
-  "MTAyNTUxNTI5NzkwNzY4MzM5OA.GqTGN_.gDslDscuxvkhYD5EGoYoGxWz5CmpYvDysuXyWU"
+  process.env.TOKEN
 );
