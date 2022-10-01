@@ -1,5 +1,7 @@
+const env = require(`dotenv`).config();
 const cohere = require('cohere-ai');
-cohere.init('0rv0oKdwrI50yZ78FwIJr83HkmtyQzmh1LB5sMCI');
+
+cohere.init(process.env.API_KEY);
 (async () => {
     const response = await cohere.generate({
         model: 'xlarge',
