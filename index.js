@@ -1,8 +1,7 @@
-const cohereChat = import('./cohereChat.js');
-const twilio = import('./twilio.js');
+const cohereChat = import("./cohereChat.js");
+const twilio = import("./twilio.js");
 const env = require(`dotenv`).config();
-const cohere = require('cohere-ai')
-
+const cohere = require("cohere-ai");
 
 cohere.init(process.env.API_KEY);
 
@@ -50,23 +49,22 @@ client.on("messageCreate", (message) => {
     if (command === "help") {
       message.channel.send("Sharky is here to help!");
 
-      const phone = args.join(' ');
+      const phone = args.join(" ");
 
       twilio.getCode(phone).then((response) => {
         message.channel.send(response);
-        message.channel.send('Enter OTP to verify!');
+        message.channel.send("Enter OTP to verify!");
 
-        twilio.verfifyCode(args.join(' '), phone).then((response) => {
+        twilio.verfifyCode(args.join(" "), phone).then((response) => {
           message.channel.send(response);
         });
       });
     }
 
     if (command === "chat") {
-
-      cohereChat(args.join(' ')).then((response) => {
+      cohereChat(args.join(" ")).then((response) => {
         message.channel.send(response);
-      })
+      });
     }
   }
 });
