@@ -1,5 +1,4 @@
 const env = require(`dotenv`).config();
-const cohereChat = import('./cohereChat.js');
 const cohere = require('cohere-ai')
 const TwilioClient = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 cohere.init(process.env.API_KEY);
@@ -48,6 +47,22 @@ const verifyCode = async (req, code) => {
       return data;
     });
 };
+const cohereChat = async (text) => {
+
+  const response = await cohere.generate({
+    model: 'large',
+    prompt: `This email writing program can generate full emails from simple commands. Here are some examples:\nUser: What is a shark?\nSharky: Sharks are a group of elasmobranch fish characterized by a cartilaginous skeleton, five to seven gill slits on the sides of the head, and pectoral fins that are not fused to the head\n--\nUser: Are sharks harmful?\nSharky: Most sharks are not dangerous to humans — people are not part of their natural diet. Despite their scary reputation, sharks rarely ever attack humans and would much rather feed on fish and marine mammals. Only about a dozen of the more than 300 species of sharks have been involved in attacks on humans.\n--\nUser: ${text}\nSharky:`,
+    max_tokens: 100,
+    temperature: 0.7,
+    k: 0,
+    p: 0.75,
+    frequency_penalty: 0,
+    presence_penalty: 0,
+    stop_sequences: [],
+    return_likelihoods: 'NONE'
+  })
+  return response.body.generations[0].text;
+}
 
 const prefix = ">";
 
@@ -78,7 +93,7 @@ client.on("messageCreate", (message) => {
       }
       message.channel.send("Sharky is here to help!", message.author);
 
-      const phone = args.join(' ');
+      var phone = args.join(' ');
       console.log(phone)
 
       getCode(phone).then((response) => {
@@ -88,6 +103,9 @@ client.on("messageCreate", (message) => {
 
 
     if (command === "verify") {
+      if (!args.length) {
+        return message.channel.send(`You didn't write your OTP, ${message.author}!`);
+      }
       verifyCode(args.join(" ")).then((response) => {
         message.channel.send(response.status);
       });
