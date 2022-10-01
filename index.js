@@ -32,7 +32,6 @@ const verifyCode = async (req, code) => {
     });
 };
 
-
 cohere.init(process.env.API_KEY);
 
 const {
@@ -98,10 +97,9 @@ client.on("messageCreate", (message) => {
     }
 
     if (command === "chat") {
-
-      cohereChat(args.join(' ')).then((response) => {
+      cohereChat(args.join(" ")).then((response) => {
         message.channel.send(response);
-      })
+      });
     }
   }
 });
