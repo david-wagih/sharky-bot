@@ -1,8 +1,25 @@
 const env = require(`dotenv`).config();
 const cohereChat = import('./cohereChat.js');
 const cohere = require('cohere-ai')
-
 const TwilioClient = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+cohere.init(process.env.API_KEY);
+
+const {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  PermissionsBitField,
+  Permissions,
+} = require(`discord.js`);
+
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
+
 
 const getCode = async (phone) => {
   TwilioClient
@@ -32,25 +49,7 @@ const verifyCode = async (req, code) => {
     });
 };
 
-cohere.init(process.env.API_KEY);
-
-const {
-  Client,
-  GatewayIntentBits,
-  EmbedBuilder,
-  PermissionsBitField,
-  Permissions,
-} = require(`discord.js`);
-
 const prefix = ">";
-
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-  ],
-});
 
 client.on("ready", () => {
   console.log("Ready!");
@@ -63,12 +62,10 @@ client.on("messageCreate", (message) => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
-    // message Array
+    // Message Array
     const messageArray = message.content.split(" ");
     const argument = messageArray.slice(1);
     const cmd = messageArray[0];
-
-    // Commands
 
     // Test Commands
     if (command === "ping") {
@@ -77,7 +74,7 @@ client.on("messageCreate", (message) => {
 
     if (command === "help") {
       if (!args.length) {
-        return message.channel.send(`You didn't provide any arguments, ${message.author}!`);
+        return message.channel.send(`You didn't provide me your phone number, ${message.author}!`);
       }
       message.channel.send("Sharky is here to help!", message.author);
 
@@ -100,6 +97,17 @@ client.on("messageCreate", (message) => {
       cohereChat(args.join(" ")).then((response) => {
         message.channel.send(response);
       });
+    }
+
+    if (command === "hello") {
+      const embed = new EmbedBuilder()
+        .setTitle("Welcome to Sharky")
+        .setDescription("Your cute little friend is here to help you")
+        .setColor(0x00ff00)
+        .setThumbnail("https://cdn.discordapp.com/embed/avatars/0.png")
+        .setTimestamp()
+
+      message.channel.send({ embeds: [embed] });
     }
   }
 });
