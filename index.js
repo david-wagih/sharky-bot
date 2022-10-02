@@ -1,6 +1,6 @@
 const env = require(`dotenv`).config();
 const cohere = require("cohere-ai");
-const TwilioClient = require("twilio")(
+const twilioClient = require("twilio")(
   process.env.ACCOUNT_SID,
   process.env.AUTH_TOKEN
 );
@@ -25,7 +25,7 @@ const client = new Client({
 });
 
 const getCode = async (phone) => {
-  TwilioClient.verify
+  twilioClient.verify
     .services(process.env.VERIFY_SERVICE_SID)
     .verifications.create({
       to: `+91-${phone}`,
@@ -37,7 +37,7 @@ const getCode = async (phone) => {
 };
 
 const verifyCode = async (req, code) => {
-  TwilioClient.verify
+  twilioClient.verify
     .services(process.env.VERIFY_SERVICE_SID)
     .verificationChecks.create({
       to: `+91-${req}`,
@@ -47,6 +47,7 @@ const verifyCode = async (req, code) => {
       return data;
     });
 };
+
 const cohereChat = async (text) => {
   const response = await cohere.generate({
     model: "large",
@@ -63,7 +64,19 @@ const cohereChat = async (text) => {
   return response.body.generations[0].text.split("--")[0];
 };
 
+const sendHelp = async (phone) => {
+  twilioClient.messages
+    .create({
+      messagingServiceSid: 'MG2c8c6b2823272193fced833ed98cc068',
+      body: `This user with ${phone} Number is having an emergency. Please help him/her.`,
+      to: '911'
+    })
+    .then(message => console.log(message.sid))
+    .done();
+};
+
 const api_url = "https://type.fit/api/quotes";
+let phone = '';
 
 const prefix = ">";
 
@@ -91,16 +104,17 @@ client.on("messageCreate", async (message) => {
     if (command === "help") {
       if (!args.length) {
         return message.channel.send(
-          `You didn't provide me your phone number, ${message.author}!`
+          `You didn't provide me any phone number, ${message.author}!`
         );
       }
       message.channel.send("Sharky is here to help!", message.author);
 
-      var phone = args.join(" ");
+      phone = args.join(" ");
       console.log(phone);
 
       getCode(phone).then((response) => {
-        message.channel.send(response);
+        console.log(response)
+        message.channel.send("OTP sent to your phone number!");
       });
     }
 
@@ -110,8 +124,18 @@ client.on("messageCreate", async (message) => {
           `You didn't write your OTP, ${message.author}!`
         );
       }
+
       verifyCode(args.join(" ")).then((response) => {
-        message.channel.send(response);
+        console.log(response)
+        message.channel.send("Verified, Thanks for Using Sharky!");
+      });
+    }
+
+    if (command === "sos") {
+      console.log(phone);
+      sendHelp(phone).then((response) => {
+        console.log(response);
+        message.channel.send("check");
       });
     }
 
@@ -126,7 +150,7 @@ client.on("messageCreate", async (message) => {
         .setTitle("Welcome to Sharky")
         .setDescription("Your cute little friend is here to help you")
         .setColor(0x00ff00)
-        .setThumbnail("https://cdn.discordapp.com/embed/avatars/0.png")
+        .setThumbnail("https://media.discordapp.net/attachments/1025879306347491448/1026028018180829185/unknown.png")
         .setTimestamp();
 
       message.channel.send({ embeds: [embed] });
@@ -135,12 +159,12 @@ client.on("messageCreate", async (message) => {
       const arrayOfQuotes = await axios(api_url);
       const randomQuote =
         arrayOfQuotes.data[
-          Math.floor(Math.random() * arrayOfQuotes.data.length)
+        Math.floor(Math.random() * arrayOfQuotes.data.length)
         ];
       const embed = new EmbedBuilder()
         .setTitle("Quote of the Day")
         .setDescription(randomQuote.text)
-        .setColor(0x00ff00);
+        .setColor(0x00ff90);
 
       message.channel.send({ embeds: [embed] });
     }
