@@ -5,9 +5,8 @@ const TwilioClient = require("twilio")(
   process.env.AUTH_TOKEN
 );
 cohere.init(process.env.API_KEY);
-const https = require("https");
 const axios = require("axios");
-
+const hangman = require("discord-hangman");
 const {
   Client,
   GatewayIntentBits,
@@ -143,6 +142,39 @@ client.on("messageCreate", async (message) => {
         .setColor(0x00ff00);
 
       message.channel.send({ embeds: [embed] });
+    }
+
+    if (command === "hangman") {
+      await hangman
+        .create(interaction, "random", { displayWordOnGameOver: false })
+        .then((data) => {
+          if (!data.game) return; // If the game is cancelled or no one joins it
+
+          if (data.game.status === "won") {
+            if (data.selector)
+              interaction.reply({
+                content: `Congratulations, you found the word! ${data.selector.username}... You should provide a more complicated word next time!`,
+              });
+            // data.selector is the user who chose the word (only in custom game mode)
+            else
+              interaction.reply({
+                content: "Congratulations you found the word!",
+              });
+          } else if (data.game.status === "lost") {
+            if (data.selector)
+              interaction.reply({
+                content: `${data.selector.username} Beat you all! The word was ${data.game.word}.`,
+              });
+            else
+              interaction.reply({
+                content: `You lost! The word was ${data.game.word}.`,
+              });
+          } else {
+            interaction.reply({
+              content: "15 minutes have passed! The game is over.",
+            }); // If no one answers for 15 minutes
+          }
+        });
     }
   }
 });
