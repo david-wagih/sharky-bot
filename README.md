@@ -1,6 +1,6 @@
-<h1 align="center"> Sharky-bot 🔥 </h1> 
+<h1 align="center"> Sharky </h1> 
 
-what?? you are under attack by a shark and you dont know which type of shark is it? well, don't worry sharky bot is here to help you. Sharky is a discord dot built using Twilio and Cohere that allows user to talk and also get help during emergencies.
+What?? you are under attack by a shark and you dont know which type of shark is it? well, don't worry sharky bot is here to help you. Sharky is a discord dot built using Twilio and Cohere that allows user to talk and also get help during emergencies.
 
 <p align="center">
   <kbd>
