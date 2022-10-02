@@ -62,7 +62,7 @@ const cohereChat = async (text) => {
     stop_sequences: [],
     return_likelihoods: 'NONE'
   })
-  return response.body.generations[0].text;
+  return response.body.generations[0].text.split("--")[0];
 }
 
 
