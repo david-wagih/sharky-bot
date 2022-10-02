@@ -2,6 +2,7 @@ const env = require(`dotenv`).config();
 const cohere = require('cohere-ai')
 const TwilioClient = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 cohere.init(process.env.API_KEY);
+const https = require('https')
 
 const {
   Client,
@@ -64,6 +65,10 @@ const cohereChat = async (text) => {
   return response.body.generations[0].text;
 }
 
+
+const api_url = "https://type.fit/api/quotes";
+
+
 const prefix = ">";
 
 client.on("ready", () => {
@@ -107,7 +112,7 @@ client.on("messageCreate", (message) => {
         return message.channel.send(`You didn't write your OTP, ${message.author}!`);
       }
       verifyCode(args.join(" ")).then((response) => {
-        message.channel.send(response.status);
+        message.channel.send(response);
       });
     }
 
@@ -126,6 +131,27 @@ client.on("messageCreate", (message) => {
         .setTimestamp()
 
       message.channel.send({ embeds: [embed] });
+    }
+    if (command === "quote") {
+      // https.get(api_url)
+      //   .then(res => res.json())
+      //   .then(data => {
+      //     message.channel.send(data[0].q + " -" + data[0].a);
+      //   });
+
+      https.get(api_url, res => {
+        let data = '';
+        res.on('data', chunk => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          console.log(data)
+          // data = JSON.stringify(data);
+          message.channel.send(data[0].text + " -" + data[0].author);
+        })
+      }).on('error', err => {
+        console.log(err.message);
+      })
     }
   }
 });
